@@ -4,9 +4,9 @@ import {
   leerFicheroStopWords,
   descarteTerminos,
   lematizacionSimple,
-} from "./utilidades";
+} from "./utilidades.js";
 
-import { analyzeDocumentsHTML } from "./op_matematicas";
+import { analyzeDocumentsHTML } from "./op_matematicas.js";
 
 document.getElementById("formulario").addEventListener("submit", function (e) {
   e.preventDefault(); // Evitar recarga
@@ -53,7 +53,7 @@ async function ejecutar() {
   } catch (error) {
     console.error("Error:", error);
     document.getElementById(
-      "resultado"
+      "resultado_ejercicio"
     ).innerHTML = `<p style='color:red;'>Error: ${error.message || error}</p>`;
   }
 }

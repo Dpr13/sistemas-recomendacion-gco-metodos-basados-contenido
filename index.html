@@ -18,7 +18,19 @@
           </h1>
         </div>
 
-        <form id="formulario" class="space-y-4">
+        <form
+          id="formulario"
+          class="space-y-4"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <script>
+            // Función única para limpiar mensajes de error de los inputs de fichero
+            function limpiarErrores(id) {
+              const messageDisplay = document.getElementById(id);
+              if (messageDisplay) messageDisplay.textContent = "";
+            }
+          </script>
           <div class="bg-gray-100 rounded-2xl p-6">
             <h2
               class="text-xl font-semibold text-gray-800 mb-4 flex items-center"
@@ -39,7 +51,7 @@
               Ficheros de entrada
             </h2>
             <label
-              for="myfile"
+              for="ficheros_entrada"
               class="block text-sm font-medium text-gray-700 mb-2"
               >Sube un conjunto de ficheros:</label
             >
@@ -48,17 +60,9 @@
               id="ficheros_entrada"
               name="ficheros_entrada"
               multiple
-              onclick="limpiarErrores()"
+              onclick="limpiarErrores('message_error_input_files')"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:transition-colors cursor-pointer"
             />
-            <script>
-              function limpiarErrores() {
-                const messageDisplay = document.getElementById(
-                  "message_error_input_files"
-                );
-                messageDisplay.textContent = "";
-              }
-            </script>
             <div id="message_error_input_files" class="mt-2 text-sm"></div>
           </div>
 
@@ -82,7 +86,7 @@
               Fichero con palabras de parada
             </h2>
             <label
-              for="myfile"
+              for="fichero_stop_words"
               class="block text-sm font-medium text-gray-700 mb-2"
               >Sube un fichero:</label
             >
@@ -90,17 +94,9 @@
               type="file"
               id="fichero_stop_words"
               name="fichero_stop_words"
-              onclick="limpiarErrores()"
+              onclick="limpiarErrores('message_error_stop_words')"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 file:transition-colors cursor-pointer"
             />
-            <script>
-              function limpiarErrores() {
-                const messageDisplay = document.getElementById(
-                  "message_error_stop_words"
-                );
-                messageDisplay.textContent = "";
-              }
-            </script>
             <div id="message_error_stop_words" class="mt-2 text-sm"></div>
           </div>
 
@@ -124,7 +120,7 @@
               Fichero de lematización de términos
             </h2>
             <label
-              for="myfile"
+              for="fichero_lematizacion"
               class="block text-sm font-medium text-gray-700 mb-2"
               >Sube un fichero:</label
             >
@@ -132,17 +128,9 @@
               type="file"
               id="fichero_lematizacion"
               name="fichero_lematizacion"
-              onclick="limpiarErrores()"
+              onclick="limpiarErrores('message_error_lematizacion')"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 file:transition-colors cursor-pointer"
             />
-            <script>
-              function limpiarErrores() {
-                const messageDisplay = document.getElementById(
-                  "message_error_lematizacion"
-                );
-                messageDisplay.textContent = "";
-              }
-            </script>
             <div id="message_error_lematizacion" class="mt-2 text-sm"></div>
           </div>
 

@@ -147,7 +147,7 @@ export function leeFicheroLematizacion() {
         resolve(diccionario);
       } catch (error) {
         showMessage(
-          messageDisplay1,
+          messageDisplay3,
           "Error: El archivo no es un JSON válido",
           "error"
         );
@@ -158,7 +158,7 @@ export function leeFicheroLematizacion() {
     reader.onerror = () => {
       showMessage(
         messageDisplay3,
-        "Error leyendo el diccionario. Inténtelo de nuevo.",
+        "Error leyendo el fichero de lematizacion. Inténtelo de nuevo.",
         "error"
       );
       reject("Error al leer el archivo");
@@ -191,10 +191,38 @@ export function descarteTerminos(textos, descartes) {
  * @returns string[] - Array de textos lematizados.
  */
 export function lematizacionSimple(textos, lemas) {
+  // Validaciones y soporte para distintos formatos de 'lemas'
+  if (!lemas) {
+    console.warn(
+      "lematizacionSimple: 'lemas' es null o undefined — se devuelve el texto original"
+    );
+    return textos;
+  }
+
+  // Normalizar 'lemas' a una lista de entradas [palabra, lema]
+  let entradas;
+  if (lemas instanceof Map) {
+    entradas = Array.from(lemas.entries());
+  } else if (Array.isArray(lemas)) {
+    // Asumimos que ya es un array de pares [palabra, lema]
+    entradas = lemas;
+  } else if (typeof lemas === "object") {
+    // JSON.parse devuelve un objeto; convertir a entries
+    entradas = Object.entries(lemas);
+  } else {
+    console.warn("lematizacionSimple: formato de 'lemas' no soportado:", lemas);
+    return textos;
+  }
+
   return textos.map((texto) => {
     let textoLematizado = texto;
-    for (const [palabra, lema] of lemas.entries()) {
-      const regex = new RegExp(`\\b${palabra}\\b`, "gi");
+    for (const [palabra, lema] of entradas) {
+      // Escapar caracteres especiales en la palabra antes de usar en regex
+      const palabraEscapada = String(palabra).replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+      const regex = new RegExp(`\\b${palabraEscapada}\\b`, "gi");
       textoLematizado = textoLematizado.replace(regex, lema);
     }
     return textoLematizado;
