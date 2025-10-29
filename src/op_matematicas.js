@@ -1,5 +1,8 @@
-
-// Tokenizar texto
+/**
+ * 
+ * @param string|array text - Texto o array de texto a tokenizar.
+ * @returns string[] - Array de tokens.
+ */
 function tokenize(text) {
   if (Array.isArray(text)) {
     text = text.join(' ');
@@ -10,7 +13,12 @@ function tokenize(text) {
     .filter(Boolean);
 }
 
-// Calcular TF (Frecuencia de Términos) para un documento
+/**
+ * 
+ * @param string[] docTokens - Tokens del documento.
+ * @param string[] vocabulary - Vocabulario único.
+ * @returns number[] - Vector TF.
+ */
 function computeTF(docTokens, vocabulary) {
   const termCounts = {};
   docTokens.forEach(term => {
@@ -20,7 +28,12 @@ function computeTF(docTokens, vocabulary) {
   return vocabulary.map(term => (termCounts[term] || 0) / totalTerms);
 }
 
-// Calcular IDF (Frecuencia Inversa de Documento) para todos los documentos
+/**
+ * 
+ * @param string[][] docsTokens - Array de documentos tokenizados.
+ * @param string[] vocabulary - Vocabulario único.
+ * @returns number[] - Vector IDF.
+ */
 function computeIDF(docsTokens, vocabulary) {
   const numDocs = docsTokens.length;
   return vocabulary.map(term => {
@@ -29,36 +42,23 @@ function computeIDF(docsTokens, vocabulary) {
   });
 }
 
-// Calcular TF-IDF
+/**
+ * 
+ * @param number[][] tfMatrix - Matriz TF.
+ * @param number[] idfVector - Vector IDF.
+ * @returns number[][] - Matriz TF-IDF.
+ */
 function computeTFIDF(tfMatrix, idfVector) {
   return tfMatrix.map(tfVector =>
     tfVector.map((tf, i) => tf * idfVector[i])
   );
 }
 
-// Similitud coseno
-function cosineSimilarity(vecA, vecB) {
-  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-// Matriz de similitud coseno
-function cosineSimilarityMatrix(tfidfMatrix) {
-  const numDocs = tfidfMatrix.length;
-  const matrix = Array.from({ length: numDocs }, () => Array(numDocs).fill(0));
-
-  for (let i = 0; i < numDocs; i++) {
-    for (let j = i; j < numDocs; j++) {
-      const sim = cosineSimilarity(tfidfMatrix[i], tfidfMatrix[j]);
-      matrix[i][j] = sim;
-      matrix[j][i] = sim; // simétrica
-    }
-  }
-  return matrix;
-}
-
+/**
+ * 
+ * @param string[] documents - Array de documentos como strings.
+ * @returns string[] - Array de tablas HTML con TF, IDF y TF-IDF por documento.
+ */
 export function analyzeDocumentsHTML(documents) {
   // Tokenizar cada documento
   const docsTokens = documents.map(tokenize);
@@ -74,41 +74,119 @@ export function analyzeDocumentsHTML(documents) {
   // Crear una tabla HTML por documento
   const htmlTables = documents.map((doc, i) => {
     let html = `
-      <table class="tfidf-table">
-        <caption>📄 Documento ${i + 1}</caption>
-        <thead>
-          <tr>
-            <th>Índice</th>
-            <th>Término</th>
-            <th>TF</th>
-            <th>IDF</th>
-            <th>TF-IDF</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div class="document-scroll" style="max-height:260px; overflow:auto; border:1px solid #ddd; padding:8px; margin-bottom:1rem;">
+        <table class="tfidf-table" style="width:100%; border-collapse:collapse;">
+          <caption>Documento ${i + 1}</caption>
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:4px;">Índice</th>
+              <th style="text-align:left; padding:4px;">Término</th>
+              <th style="text-align:right; padding:4px;">TF</th>
+              <th style="text-align:right; padding:4px;">IDF</th>
+              <th style="text-align:right; padding:4px;">TF-IDF</th>
+            </tr>
+          </thead>
+          <tbody>
     `;
 
     vocabulary.forEach((term, idx) => {
       html += `
         <tr>
-          <td>${idx}</td>
-          <td>${term}</td>
-          <td>${tfMatrix[i][idx].toFixed(3)}</td>
-          <td>${idfVector[idx].toFixed(3)}</td>
-          <td>${tfidfMatrix[i][idx].toFixed(3)}</td>
+          <td style="padding:4px;">${idx}</td>
+          <td style="padding:4px;">${term}</td>
+          <td style="padding:4px; text-align:right;">${tfMatrix[i][idx].toFixed(3)}</td>
+          <td style="padding:4px; text-align:right;">${idfVector[idx].toFixed(3)}</td>
+          <td style="padding:4px; text-align:right;">${tfidfMatrix[i][idx].toFixed(3)}</td>
         </tr>
       `;
     });
 
     html += `
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     `;
 
     return html.trim();
   });
 
-  return htmlTables; // Array con una tabla HTML por documento
+  return htmlTables; 
 }
 
+/**
+ * 
+ * @param number[] vecA - Vector A.
+ * @param number[] vecB - Vector B.
+ * @returns number - Similitud coseno entre los vectores A y B.
+ */
+function cosineSimilarity(vecA, vecB) {
+  let dot = 0;
+  let magA = 0;
+  let magB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    const a = vecA[i] || 0;
+    const b = vecB[i] || 0;
+    dot += a * b;
+    magA += a * a;
+    magB += b * b;
+  }
+  if (magA === 0 || magB === 0) return 0; // evitar división por cero
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+}
 
+/**
+ * 
+ * @param number[][] tfidfMatrix - Matriz TF-IDF.
+ * @returns number[][] - Matriz de similitud coseno.
+ */
+function computeCosineSimilarityMatrix(tfidfMatrix) {
+  const n = tfidfMatrix.length;
+  const simMatrix = Array.from({ length: n }, () => Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = i; j < n; j++) {
+      const sim = cosineSimilarity(tfidfMatrix[i], tfidfMatrix[j]);
+      simMatrix[i][j] = sim;
+      simMatrix[j][i] = sim;
+    }
+  }
+  return simMatrix;
+}
+
+/**
+ * 
+ * @param string[] documents - Array de documentos como strings.
+ * @returns string - Tabla HTML con la matriz de similitud coseno.
+ */
+export function computeCosineDistances(documents) {
+  const docsTokens = documents.map(tokenize);
+  const vocabulary = [...new Set(docsTokens.flat())];
+  const tfMatrix = docsTokens.map(doc => computeTF(doc, vocabulary));
+  const idfVector = computeIDF(docsTokens, vocabulary);
+  const tfidfMatrix = computeTFIDF(tfMatrix, idfVector);
+
+  const similarityMatrix = computeCosineSimilarityMatrix(tfidfMatrix);
+
+      let html = `
+        <div>
+        <h3 style="text-align:center; margin:0 0 10px;">Similitud coseno</h3>
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;">
+          <thead>
+          <tr>
+            <th></th>
+            ${similarityMatrix.map((_, i) => `<th>Doc ${i + 1}</th>`).join('')}
+          </tr>
+          </thead>
+          <tbody>
+          ${similarityMatrix.map((row, i) => `
+            <tr>
+            <th>Doc ${i + 1}</th>
+            ${row.map(v => `<td>${v.toFixed(3)}</td>`).join('')}
+            </tr>
+          `).join('')}
+          </tbody>
+        </table>
+        </div>
+      `;
+
+  return html.trim();
+}

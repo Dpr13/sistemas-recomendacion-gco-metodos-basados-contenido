@@ -6,7 +6,7 @@ import {
   lematizacionSimple,
 } from "./utilidades.js";
 
-import { analyzeDocumentsHTML } from "./op_matematicas.js";
+import { analyzeDocumentsHTML, computeCosineDistances} from "./op_matematicas.js";
 
 document.getElementById("formulario").addEventListener("submit", function (e) {
   e.preventDefault(); // Evitar recarga
@@ -50,6 +50,10 @@ async function ejecutar() {
     // Mostrar matriz con resultados
     document.getElementById("resultado_ejercicio").innerHTML =
       array_resultados_unida;
+  
+    // Mostrar resultados de distancias coseno
+    const coseno_resultados = computeCosineDistances(matrizProcesada);
+    document.getElementById("coseno_resultado").innerHTML = coseno_resultados;
   } catch (error) {
     console.error("Error:", error);
     document.getElementById(

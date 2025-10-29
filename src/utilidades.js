@@ -14,7 +14,10 @@ function showMessage(messageDisplay, message, type) {
   messageDisplay.style.fontSize = "12px";
 }
 
-// Leer ficheros de entrada
+/**
+ * Lee los ficheros de entrada.
+ * @returns Promise<string[]> - Array con el contenido de los ficheros.
+ */
 export function leeFicherosEntrada() {
   const ficheros_entrada = document.getElementById("ficheros_entrada");
 
@@ -79,7 +82,10 @@ export function leeFicherosEntrada() {
     });
 }
 
-// Leer fichero que contiene las stop words
+/**
+ * Lee el fichero de stop words.
+ * @returns Promise<string[]> - Array de stop words.
+ */
 export function leerFicheroStopWords() {
   const fichero_stop_words =
     document.getElementById("fichero_stop_words").files[0];
@@ -118,7 +124,10 @@ export function leerFicheroStopWords() {
   });
 }
 
-// Leer fichero de lematización de términos
+/**
+ * Lee el fichero de lematización de términos.
+ * @returns Promise<Map<string, string>> - Un mapa con los términos y sus lemas.
+ */
 export function leeFicheroLematizacion() {
   const input_diccionario = document.getElementById("fichero_lematizacion");
 
@@ -228,3 +237,4 @@ export function lematizacionSimple(textos, lemas) {
     return textoLematizado;
   });
 }
+
