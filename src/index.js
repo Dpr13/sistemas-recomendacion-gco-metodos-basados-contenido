@@ -1,11 +1,12 @@
 import {
-  leeDiccionario,
   leeFicheroLematizacion,
   leeFicherosEntrada,
   leerFicheroStopWords,
   descarteTerminos,
   lematizacionSimple,
 } from "./utilidades";
+
+import { analyzeDocumentsHTML } from "./op_matematicas";
 
 document.getElementById("formulario").addEventListener("submit", function (e) {
   e.preventDefault(); // Evitar recarga
@@ -19,6 +20,8 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
  */
 async function ejecutar() {
   try {
+    console.log("Ismaelito");
+
     // Limpiar resultados anteriores
     document.getElementById("resultado_ejercicio").innerHTML = "";
     document.getElementById("coseno_resultado").innerHTML = "";
@@ -41,11 +44,12 @@ async function ejecutar() {
     // Mostrar mensaje de espera
     document.getElementById("mensaje_espera").innerHTML = "";
 
-    analyzeDocuments(matrizProcesada);
+    const array_resultados = analyzeDocumentsHTML(matrizProcesada);
+    const array_resultados_unida = array_resultados.join(" ");
 
     // Mostrar matriz con resultados
     document.getElementById("resultado_ejercicio").innerHTML =
-      matrizSinCalculoPredicciones;
+      array_resultados_unida;
   } catch (error) {
     console.error("Error:", error);
     document.getElementById(

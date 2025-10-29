@@ -59,16 +59,7 @@ function cosineSimilarityMatrix(tfidfMatrix) {
   return matrix;
 }
 
-// === FUNCIÓN PRINCIPAL ===
-/**
- * Recibe un array de strings (cada string = contenido de un documento)
- * Devuelve un objeto con:
- * - vocabulary
- * - matrices TF, IDF, TF-IDF
- * - matriz de similitud coseno
- * - tabla detallada por documento
- */
-function analyzeDocuments(documents) {
+export function analyzeDocumentsHTML(documents) {
   // Tokenizar cada documento
   const docsTokens = documents.map(tokenize);
 
@@ -80,34 +71,44 @@ function analyzeDocuments(documents) {
   const idfVector = computeIDF(docsTokens, vocabulary);
   const tfidfMatrix = computeTFIDF(tfMatrix, idfVector);
 
-  // Calcular similitud coseno
-  const cosineMatrix = cosineSimilarityMatrix(tfidfMatrix);
+  // Crear una tabla HTML por documento
+  const htmlTables = documents.map((doc, i) => {
+    let html = `
+      <table class="tfidf-table">
+        <caption>📄 Documento ${i + 1}</caption>
+        <thead>
+          <tr>
+            <th>Índice</th>
+            <th>Término</th>
+            <th>TF</th>
+            <th>IDF</th>
+            <th>TF-IDF</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
 
-  // Construir resultados detallados por documento
-  const resultados = documents.map((doc, i) => {
-    const tabla = vocabulary.map((term, idx) => ({
-      Indice: idx,
-      Termino: term,
-      TF: parseFloat(tfMatrix[i][idx].toFixed(3)),
-      IDF: parseFloat(idfVector[idx].toFixed(3)),
-      TF_IDF: parseFloat(tfidfMatrix[i][idx].toFixed(3)),
-    }));
-    return {
-      documento: i + 1,
-      contenido: doc,
-      tabla,
-    };
+    vocabulary.forEach((term, idx) => {
+      html += `
+        <tr>
+          <td>${idx}</td>
+          <td>${term}</td>
+          <td>${tfMatrix[i][idx].toFixed(3)}</td>
+          <td>${idfVector[idx].toFixed(3)}</td>
+          <td>${tfidfMatrix[i][idx].toFixed(3)}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    `;
+
+    return html.trim();
   });
 
-  // Devolver toda la información como objeto
-  return {
-    vocabulary,
-    tfMatrix,
-    idfVector,
-    tfidfMatrix,
-    cosineMatrix,
-    resultados,
-  };
+  return htmlTables; // Array con una tabla HTML por documento
 }
 
 
