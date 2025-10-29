@@ -45,12 +45,11 @@ async function ejecutar() {
     document.getElementById("mensaje_espera").innerHTML = "";
 
     const array_resultados = analyzeDocumentsHTML(matrizProcesada);
-    const array_resultados_unida = array_resultados.join(" ");
 
     // Mostrar matriz con resultados
     document.getElementById("resultado_ejercicio").innerHTML =
-      array_resultados_unida;
-  
+      array_resultados;
+
     // Mostrar resultados de distancias coseno
     const coseno_resultados = computeCosineDistances(matrizProcesada);
     document.getElementById("coseno_resultado").innerHTML = coseno_resultados;

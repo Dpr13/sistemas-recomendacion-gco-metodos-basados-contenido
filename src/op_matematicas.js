@@ -71,44 +71,62 @@ export function analyzeDocumentsHTML(documents) {
   const idfVector = computeIDF(docsTokens, vocabulary);
   const tfidfMatrix = computeTFIDF(tfMatrix, idfVector);
 
-  // Crear una tabla HTML por documento
-  const htmlTables = documents.map((doc, i) => {
+  // Crear una tabla HTML por documento, ordenando términos por TF descendente
+  const docHtmlArray = documents.map((doc, i) => {
+    // Construir filas con datos y ordenar por TF (desc)
+    const rows = vocabulary.map((term, idx) => ({
+      term,
+      vocabIndex: idx,
+      tf: tfMatrix[i][idx],
+      idf: idfVector[idx],
+      tfidf: tfidfMatrix[i][idx]
+    })).sort((a, b) => b.tf - a.tf);
+
     let html = `
-      <div class="document-scroll" style="max-height:260px; overflow:auto; border:1px solid #ddd; padding:8px; margin-bottom:1rem;">
-        <table class="tfidf-table" style="width:100%; border-collapse:collapse;">
-          <caption>Documento ${i + 1}</caption>
-          <thead>
-            <tr>
-              <th style="text-align:left; padding:4px;">Índice</th>
-              <th style="text-align:left; padding:4px;">Término</th>
-              <th style="text-align:right; padding:4px;">TF</th>
-              <th style="text-align:right; padding:4px;">IDF</th>
-              <th style="text-align:right; padding:4px;">TF-IDF</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div class="document-scroll" style="max-height:260px; overflow-y:auto; overflow-x:auto; box-sizing:border-box; border:1px solid #ddd; padding:8px; margin-bottom:1rem; background:#fff;">
+      <table class="tfidf-table" style="width:100%; border-collapse:collapse;">
+        <caption>Documento ${i + 1}</caption>
+        <thead>
+        <tr>
+          <th style="text-align:left; padding:4px;">Índice</th>
+          <th style="text-align:left; padding:4px;">Término</th>
+          <th style="text-align:right; padding:4px;">TF</th>
+          <th style="text-align:right; padding:4px;">IDF</th>
+          <th style="text-align:right; padding:4px;">TF-IDF</th>
+        </tr>
+        </thead>
+        <tbody>
     `;
 
-    vocabulary.forEach((term, idx) => {
+    // Renderizar filas ya ordenadas por TF
+    rows.forEach(row => {
       html += `
-        <tr>
-          <td style="padding:4px;">${idx}</td>
-          <td style="padding:4px;">${term}</td>
-          <td style="padding:4px; text-align:right;">${tfMatrix[i][idx].toFixed(3)}</td>
-          <td style="padding:4px; text-align:right;">${idfVector[idx].toFixed(3)}</td>
-          <td style="padding:4px; text-align:right;">${tfidfMatrix[i][idx].toFixed(3)}</td>
-        </tr>
+      <tr>
+        <td style="padding:4px;">${row.vocabIndex}</td>
+        <td style="padding:4px;">${row.term}</td>
+        <td style="padding:4px; text-align:right;">${row.tf.toFixed(3)}</td>
+        <td style="padding:4px; text-align:right;">${row.idf.toFixed(3)}</td>
+        <td style="padding:4px; text-align:right;">${row.tfidf.toFixed(3)}</td>
+      </tr>
       `;
     });
 
     html += `
-          </tbody>
-        </table>
+        </tbody>
+      </table>
       </div>
     `;
 
     return html.trim();
   });
+
+  // Envolver todos los documentos en un contenedor que NO tenga scroll.
+  // De este modo solo cada .document-scroll mostrará su propio scrollbar.
+  const htmlTables = `
+    <div class="documents-wrapper" style="overflow:visible; max-height:none;">
+      ${docHtmlArray.join('\n')}
+    </div>
+  `;
 
   return htmlTables; 
 }
