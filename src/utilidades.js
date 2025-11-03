@@ -43,9 +43,10 @@ export function leeFicherosEntrada() {
           // Leer todo el contenido del archivo
           let contenido = reader.result;
 
-          // Limpiar: mantener solo letras (incluyendo tildes, eñes) y espacios
-          // Eliminar números, puntuación, símbolos
-          contenido = contenido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, " ");
+          // Limpiar: mantener solo letras (incluyendo tildes, eñes), espacios y apóstrofes
+          // Conservamos tanto el apóstrofo simple (') como el tipográfico (’)
+          // Eliminar números, otra puntuación y símbolos
+          contenido = contenido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'’]/g, " ");
 
           // Eliminar espacios múltiples y trim
           contenido = contenido.replace(/\s+/g, " ").trim();
