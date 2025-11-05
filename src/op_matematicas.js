@@ -38,7 +38,10 @@ function computeIDF(docsTokens, vocabulary) {
   const numDocs = docsTokens.length;
   return vocabulary.map(term => {
     const docsWithTerm = docsTokens.filter(doc => doc.includes(term)).length;
-    return Math.log(numDocs / (1 + docsWithTerm)); // +1 para evitar división por cero
+    if (docsWithTerm === 0) {
+      return 0;
+    }
+    return Math.log(numDocs / docsWithTerm);
   });
 }
 
